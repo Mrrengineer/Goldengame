@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -1001,3 +998,52 @@
                     particle.style.top = `${startY}px`;
                     particle.style.setProperty('--x', `${endX}px`);
                     particle.style.setProperty('--y', `${endY}
+                    
+                    const size = 3 + Math.random() * 7;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+
+                    const hue = 40 + Math.random() * 20;
+                    particle.style.background = `hsl(${hue}, 100%, 50%)`;
+
+                    particle.style.animation = `particleFly ${0.8 + Math.random() * 0.7}s forwards`;
+
+                    particlesContainer.appendChild(particle);
+
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 2000);
+                }
+            }
+
+            function endGame() {
+                gameActive = false;
+                clearInterval(timer);
+                if (!isMuted) gameOverSound.play().catch(() => {});
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                startBtn.innerHTML = `<i class="fas fa-play"></i> ${languageData[currentLanguage].startGame}`;
+                startBtn.disabled = false;
+                timerBar.classList.remove('pulse');
+
+                if (score > record) {
+                    record = score;
+                    localStorage.setItem('goldenshineRecord', record);
+                    recordDisplay.textContent = record;
+                }
+
+                finalScore.textContent = score;
+                finalRecord.textContent = record;
+                finalCombo.textContent = `x${maxCombo}`;
+                resultScreen.style.display = 'block';
+
+                colorDisplay.style.color = '#ffd700';
+                createParticles(100);
+            }
+
+            updateLanguage();
+            updateMuteState();
+        });
+    </script>
+</body>
+</html>
