@@ -428,6 +428,29 @@
             box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
         }
 
+        .timer-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            border-radius: 6px;
+            transition: width 0.02s linear, background 0.3s ease;
+        }
+
+        .timer-bar.pulse {
+            animation: pulse 0.6s infinite;
+        }
+
         @keyframes shine {
             0% { transform: rotate(30deg) translateX(-100%); }
             100% { transform: rotate(30deg) translateX(100%); }
@@ -456,7 +479,8 @@
 
         @keyframes pulse {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
+            70% { transform: scale оч
+            scale(1.05); box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
         }
 
@@ -492,6 +516,10 @@
             .score-display { font-size: 2.2rem; }
             .game-info { font-size: 0.9rem; gap: 10px; }
             .instructions p { font-size: 0.8rem; }
+            .timer-container {
+                height: 10px;
+                margin: 10px 0;
+            }
         }
 
         @media (max-width: 480px) {
@@ -513,6 +541,10 @@
             .score-display { font-size: 2rem; }
             .record-display, .max-combo-display { font-size: 1.2rem; }
             .instructions h2 { font-size: 1.2rem; }
+            .timer-container {
+                height: 8px;
+                margin: 8px 0;
+            }
         }
     </style>
 </head>
@@ -648,11 +680,11 @@
             const instruction3 = document.getElementById('instruction3');
             const instruction4 = document.getElementById('instruction4');
             const instruction5 = document.getElementById('instruction5');
-            const instruction6 = document.getElementById('instruction6');
+            const instruction6 = document.getElementById(' instruction6');
             const startGameText = document.getElementById('startGameText');
             const timeLimitText = document.getElementById('timeLimitText');
             const muteToggle = document.getElementById('muteToggle');
-            const muteLabel = document.getElementById('muteLabel');
+            const muteLabel = document.getElementBy conocido('muteLabel');
             const scoreLabel = document.getElementById('scoreLabel');
             const recordLabelGameInfo = document.getElementById('recordLabelGameInfo');
             const comboLabel = document.getElementById('comboLabel');
@@ -871,7 +903,7 @@
                 resultScreen.style.display = 'none';
 
                 if (!isMuted) {
-                    backgroundMusic.play().catch(() => {});
+                    backgroundMusic.play().catch(err => console.error('خطای پخش صدا:', err));
                 }
 
                 generateNewColor();
@@ -913,18 +945,22 @@
             function startTimer() {
                 timeLeft = 100;
                 timerBar.style.width = '100%';
-                timerBar.style.backgroundColor = '#ffd700';
+                timerBar.style.background = 'linear-gradient(to right, #ffd700, #ff8c00)';
+                timerBar.classList.remove('pulse');
 
                 clearInterval(timer);
                 timer = setInterval(() => {
                     timeLeft -= 100 / (timeLimit / 20);
-                    timerBar.style.width = timeLeft + '%';
+                    timerBar.style.width = `${timeLeft}%`;
 
                     if (timeLeft < 30) {
-                        timerBar.style.backgroundColor = '#e74c3c';
+                        timerBar.style.background = 'linear-gradient(to right, #e74c3c, #c0392b)';
                         timerBar.classList.add('pulse');
                     } else if (timeLeft < 60) {
-                        timerBar.style.backgroundColor = '#ff8c00';
+                        timerBar.style.background = 'linear-gradient(to right, #ff8c00, #d35400)';
+                        timerBar.classList.remove('pulse');
+                    } else {
+                        timerBar.style.background = 'linear-gradient(to right, #ffd700, #ff8c00)';
                         timerBar.classList.remove('pulse');
                     }
 
@@ -944,7 +980,7 @@
                     score += combo;
                     scoreDisplay.textContent = score;
                     createParticles(15 * combo);
-                    if (!isMuted) correctSound.play().catch(() => {});
+                    if (!isMuted) correctSound.play().catch(err => console.error('خطای پخش صدا:', err));
 
                     consecutiveCorrect++;
 
@@ -976,7 +1012,7 @@
                         startTimer();
                     }, 150);
                 } else {
-                    if (!isMuted) wrongSound.play().catch(() => {});
+                    if (!isMuted) wrongSound.play().catch(err => console.error('خطای پخش صدا:', err));
                     endGame();
                 }
             }
@@ -1019,11 +1055,14 @@
             function endGame() {
                 gameActive = false;
                 clearInterval(timer);
-                if (!isMuted) gameOverSound.play().catch(() => {});
+                if (!isMuted) gameOverSound.play().catch(err => console.error('خطای پخش صدا:', err));
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
                 startBtn.innerHTML = `<i class="fas fa-play"></i> ${languageData[currentLanguage].startGame}`;
                 startBtn.disabled = false;
+
+                timerBar.style.width = '100%';
+                timerBar.style.background = 'linear-gradient(to right, #ffd700, #ff8c00)';
                 timerBar.classList.remove('pulse');
 
                 if (score > record) {
